@@ -1,5 +1,5 @@
-import Image from "next/image";
-import { HomeIcon } from "@heroicons/react/24/solid";
+import Image from "next/Image";
+import { EllipsisHorizontalIcon, HomeIcon } from "@heroicons/react/24/solid";
 import SidebarLink from "./SidebarLink";
 import {
   HashtagIcon,
@@ -25,6 +25,23 @@ function Sidebar() {
         <SidebarLink text="Lists" Icon={ListBulletIcon} />
         <SidebarLink text="Profile" Icon={UserIcon} />
         <SidebarLink text="More" Icon={EllipsisHorizontalCircleIcon} />
+      </div>
+      <button className="text-white hidden xl:inline ml-auto bg-[#1d9bf0] rounded-full w-56 h-[52px] text-lg font-bold shadow-md hover:bg-[#1a8cd8] ">
+        Tweet
+      </button>
+      <div
+        className="text-[#d9d9d9] flex items-center justify-center mt-auto hoverAnimation xl:ml-auto xl:-mr-5"
+      >
+        <img
+        
+          alt=""
+          className="h-10 w-10 rounded-full xl:mr-2.5"
+        />
+        <div className="hidden xl:inline leading-5">
+          <h4 className="font-bold">ass</h4>
+          <p className="text-[#6e767d]">Manager</p>
+        </div>
+        <EllipsisHorizontalIcon className="h-5 hidden xl:inline ml-10" />
       </div>
     </div>
   );

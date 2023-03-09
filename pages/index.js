@@ -1,7 +1,7 @@
 import Head from 'next/head'
-import Sidebar from '@/components/sidebar'
+import Sidebar from '@/components/Sidebar'
 
-export default function Home() {
+const  Home = () => {
   return (
     <>
       <Head>
@@ -17,3 +17,4 @@ export default function Home() {
     </>
   )
 }
+export default Home

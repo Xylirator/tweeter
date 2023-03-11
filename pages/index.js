@@ -1,7 +1,8 @@
-import Head from 'next/head'
-import Sidebar from '@/components/Sidebar'
+import Head from "next/head";
+import Sidebar from "@/components/Sidebar";
+import Feed from "@/components/Feed";
 
-const  Home = () => {
+const Home = () => {
   return (
     <>
       <Head>
@@ -10,11 +11,11 @@ const  Home = () => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className='bg-black min-h-screen flex max-w-[1500px] mx-auto'>
-      <Sidebar/> 
-
+      <main className="bg-black min-h-screen flex max-w-[1500px] mx-auto">
+        <Sidebar />
+        <Feed />
       </main>
     </>
-  )
-}
-export default Home
+  );
+};
+export default Home;

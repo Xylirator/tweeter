@@ -7,12 +7,53 @@ import {
 } from "@heroicons/react/24/outline";
 import { useState, useRef } from "react";
 import Picker from "@emoji-mart/react";
+import { db, storage } from "../firebase";
+
+import {
+  addDoc,
+  collection,
+  doc,
+  serverTimestamp,
+  updateDoc,
+} from "@firebase/firestore";
+import { getDownloadURL, ref, uploadString } from "@firebase/storage";
 
 function Input() {
   const [input, setInput] = useState();
   const [selectedFile, setSelectedFile] = useState(null);
   const [showEmojis, setShowEmojis] = useState(false);
   const filePickerRef = useRef(null);
+  const [loading, setLoading] = useState(false);
+
+  const sendPost = async () => {
+    if (loading) return;
+    setLoading(true);
+
+    const docRef = await addDoc(collection(db, "posts"), {
+      // id: session.user.uid,
+      // username: session.user.name,
+      // userImg: session.user.image,
+      // tag: session.user.tag,
+      text: input,
+      timestamp: serverTimestamp(),
+    });
+
+    const imageRef = ref(storage, `posts/${docRef.id}/image`);
+
+    if (selectedFile) {
+      await uploadString(imageRef, selectedFile, "data_url")
+        .then(async () => {
+          const downloadURL = await getDownloadURL(imageRef);
+          await updateDoc(doc(db, "posts", docRef.id), {
+            image: downloadURL,
+          });
+        });
+    }
+    setLoading(false);
+    setInput("");
+    setSelectedFile(null);
+    setShowEmojis(false);
+  };
 
   const addImageToPost = () => {};
 
@@ -80,9 +121,15 @@ function Input() {
             <div className="icon">
               <CalendarDaysIcon className="h-[22px] text-[#1d9bf0]" />
             </div>
-            {showEmojis && ( <Picker onEmojiSelect={addEmoji} theme="dark" />)}
+            {showEmojis && <Picker onEmojiSelect={addEmoji} theme="dark" />}
           </div>
-          <button className="bg-[#1d9bf0] text-white rounded-full px-4 py-1.5 font-bold shadow-md hover:bg-[#1a8cd8] disabled:hover:bg-[#1d9bf0] disabled:opacity-50 disabled:cursor-default" disabled={!input.trim() && !selectedFile}>Tweet</button>
+          <button
+            className="bg-[#1d9bf0] text-white rounded-full px-4 py-1.5 font-bold shadow-md hover:bg-[#1a8cd8] disabled:hover:bg-[#1d9bf0] disabled:opacity-50 disabled:cursor-default"
+            disabled={!input.trim() && !selectedFile}
+            onClick={sendPost}
+          >
+            Tweet
+          </button>
         </div>
       </div>
     </div>

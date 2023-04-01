@@ -8,6 +8,7 @@ import {
 import { useState, useRef } from "react";
 import Picker from "@emoji-mart/react";
 import { db, storage } from "../firebase";
+// import { signOut, useSession } from "next-auth/react";
 
 import {
   addDoc,
@@ -19,6 +20,7 @@ import {
 import { getDownloadURL, ref, uploadString } from "@firebase/storage";
 
 function Input() {
+  // const {data: session} = useSession();
   const [input, setInput] = useState();
   const [selectedFile, setSelectedFile] = useState(null);
   const [showEmojis, setShowEmojis] = useState(false);
@@ -41,13 +43,12 @@ function Input() {
     const imageRef = ref(storage, `posts/${docRef.id}/image`);
 
     if (selectedFile) {
-      await uploadString(imageRef, selectedFile, "data_url")
-        .then(async () => {
-          const downloadURL = await getDownloadURL(imageRef);
-          await updateDoc(doc(db, "posts", docRef.id), {
-            image: downloadURL,
-          });
+      await uploadString(imageRef, selectedFile, "data_url").then(async () => {
+        const downloadURL = await getDownloadURL(imageRef);
+        await updateDoc(doc(db, "posts", docRef.id), {
+          image: downloadURL,
         });
+      });
     }
     setLoading(false);
     setInput("");
@@ -55,7 +56,16 @@ function Input() {
     setShowEmojis(false);
   };
 
-  const addImageToPost = () => {};
+  const addImageToPost = (e) => {
+    const reader = new FileReader();
+    if (e.target.files[0]) {
+      reader.readAsDataURL(e.target.files[0]);
+    }
+
+    reader.onload = (readerEvent) => {
+      setSelectedFile(readerEvent.target.result);
+    };
+  };
 
   const addEmoji = (e) => {
     let sym = e.unified.split("-");
@@ -67,7 +77,9 @@ function Input() {
 
   return (
     <div
-      className={`border-b border-gray-700 p-3 flex space-x-3 overflow-y-scroll`}
+      className={`border-b border-gray-700 p-3 flex space-x-3 overflow-y-scroll scrollbar-hide ${
+        loading && "opacity-60"
+      }`}
     >
       <img
         src="https://yt3.ggpht.com/yti/AHXOFjVEzGBrRr_in2P3gy4VNhGNe0p2UkuyyOI8i1K3=s88-c-k-c0x00ffffff-no-rj-mo"
@@ -101,36 +113,41 @@ function Input() {
             </div>
           )}
         </div>
-        <div className="flex items-center justify-between pt-2.5">
-          <div className="flex items-center">
-            <div className="icon" onClick={() => filePickerRef.current.click()}>
-              <PhotoIcon className="text-[#1d9bf0] h-[22px]" />
-              <input
-                type="file"
-                ref={filePickerRef}
-                hidden
-                onChange={addImageToPost}
-              />
+        {!loading && (
+          <div className="flex items-center justify-between pt-2.5">
+            <div className="flex items-center">
+              <div
+                className="icon"
+                onClick={() => filePickerRef.current.click()}
+              >
+                <PhotoIcon className="text-[#1d9bf0] h-[22px]" />
+                <input
+                  type="file"
+                  ref={filePickerRef}
+                  hidden
+                  onChange={addImageToPost}
+                />
+              </div>
+              <div className="icon">
+                <ChartBarIcon className="h-[22px] text-[#1d9bf0] rotate-90" />
+              </div>
+              <div className="icon" onClick={() => setShowEmojis(!showEmojis)}>
+                <FaceSmileIcon className="h-[22px] text-[#1d9bf0]" />
+              </div>
+              <div className="icon">
+                <CalendarDaysIcon className="h-[22px] text-[#1d9bf0]" />
+              </div>
+              {showEmojis && <Picker onEmojiSelect={addEmoji} theme="dark" />}
             </div>
-            <div className="icon">
-              <ChartBarIcon className="h-[22px] text-[#1d9bf0] rotate-90" />
-            </div>
-            <div className="icon" onClick={() => setShowEmojis(!showEmojis)}>
-              <FaceSmileIcon className="h-[22px] text-[#1d9bf0]" />
-            </div>
-            <div className="icon">
-              <CalendarDaysIcon className="h-[22px] text-[#1d9bf0]" />
-            </div>
-            {showEmojis && <Picker onEmojiSelect={addEmoji} theme="dark" />}
+            <button
+              className="bg-[#1d9bf0] text-white rounded-full px-4 py-1.5 font-bold shadow-md hover:bg-[#1a8cd8] disabled:hover:bg-[#1d9bf0] disabled:opacity-75 disabled:cursor-default"
+              disabled={!input && !selectedFile}
+              onClick={sendPost}
+            >
+              Tweet
+            </button>
           </div>
-          <button
-            className="bg-[#1d9bf0] text-white rounded-full px-4 py-1.5 font-bold shadow-md hover:bg-[#1a8cd8] disabled:hover:bg-[#1d9bf0] disabled:opacity-50 disabled:cursor-default"
-            disabled={!input.trim() && !selectedFile}
-            onClick={sendPost}
-          >
-            Tweet
-          </button>
-        </div>
+        )}
       </div>
     </div>
   );

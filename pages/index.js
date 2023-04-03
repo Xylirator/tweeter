@@ -18,4 +18,21 @@ const Home = () => {
     </>
   );
 };
-export default Home;
+export async function getServerSideProps(context) {
+  const trendingResults = await fetch("https://jsonkeeper.com/n/NKEV").then(
+    (res) => res.json()
+  );
+  const followResults = await fetch("https://jsonkeeper.com/b/WWMJ").then(
+    (res) => res.json()
+  );
+  const providers = await getProviders();
+  const session = await getServerSession(context);
+  return {
+    props: {
+      trendingResults,
+      followResults,
+      providers,
+      session,
+    },
+  };
+}

@@ -1,9 +1,25 @@
-import { ChartBarIcon, HeartIcon, ShareIcon, TrashIcon } from "@heroicons/react/24/outline";
+import {
+  ChartBarIcon,
+  ChatBubbleLeftIcon,
+  HeartIcon,
+  ShareIcon,
+  TrashIcon,
+} from "@heroicons/react/24/outline";
 import { EllipsisHorizontalIcon } from "@heroicons/react/24/solid";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import Moment from "react-moment";
+import { useRecoilState } from "recoil";
+import { modalState, postIdState } from "@/atoms/modalAtom";
+import { db } from "@/firebase";
 
 function Post({ id, post, postPage }) {
-  const {data: session} = useSession();
+  const { data: session } = useSession();
+  const [isOpen, setIsOpen] = useRecoilState(modalState);
+  const [postId, setPostId] = useRecoilState(modalState);
+  const [comments, setComments] = useState([]);
+  const [liked, setLiked] = useState([]);
   return (
     <div className="p-3 flex cursor-pointer border-b border-gray-700">
       {!postPage && (
@@ -39,7 +55,7 @@ function Post({ id, post, postPage }) {
             </div>
             .{" "}
             <span className="hover:underline text-sm sm:text-[15px]">
-              {/* <Moment fromNow>{post?.timestamp?.toDate()}</Moment> */}
+              <Moment fromNow>{post?.timestamp?.toDate()}</Moment>
             </span>
             {!postPage && (
               <p className="text-[#d9d9d9] text-[15px] sm:text-base mt-0.5">
@@ -66,7 +82,7 @@ function Post({ id, post, postPage }) {
             postPage && "mx-auto"
           }`}
         >
-          {/* <div
+          <div
             className="flex items-center space-x-1 group"
             onClick={(e) => {
               e.stopPropagation();
@@ -75,14 +91,14 @@ function Post({ id, post, postPage }) {
             }}
           >
             <div className="icon group-hover:bg-[#1d9bf0] group-hover:bg-opacity-10">
-              <ChatIcon className="h-5 group-hover:text-[#1d9bf0]" />
+              <ChatBubbleLeftIcon className="h-5 group-hover:text-[#1d9bf0]" />
             </div>
             {comments.length > 0 && (
               <span className="group-hover:text-[#1d9bf0] text-sm">
                 {comments.length}
               </span>
             )}
-          </div> */}
+          </div>
 
           {session.user.uid === post?.id ? (
             <div
@@ -112,14 +128,14 @@ function Post({ id, post, postPage }) {
               likePost();
             }}
           >
-            {/* <div className="icon group-hover:bg-pink-600/10">
+            <div className="icon group-hover:bg-pink-600/10">
               {liked ? (
                 <HeartIcon className="h-5 text-pink-600" />
               ) : (
                 <HeartIcon className="h-5 group-hover:text-pink-600" />
               )}
-            </div> */}
-            {/* {likes.length > 0 && (
+            </div> 
+             {/* {likes.length > 0 && (
               <span
                 className={`group-hover:text-pink-600 text-sm ${
                   liked && "text-pink-600"

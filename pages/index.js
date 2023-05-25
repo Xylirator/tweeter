@@ -19,7 +19,8 @@ export default function Home({ trendingResults, followResults, providers }) {
       <main className="bg-black min-h-screen flex max-w-[1500px] mx-auto">
         <Sidebar />
         <Feed />
-        {session.user.name}
+        {/* Widgets */}
+        <Modal/>
       </main>
     </>
   );
